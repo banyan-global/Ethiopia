@@ -970,6 +970,17 @@ body.light .hero-logo.trio img.lg-c{height:96px}body.light .hero-logo.trio img.l
 .cv-legend span{display:inline-flex;align-items:center;font-weight:800}
 .cv-legend i.ring{width:20px;height:20px;border-width:2px}
 @media(max-width:560px){.cv-hint{font-size:12.5px;padding:10px 12px}.cv-bar .cv-legend{font-size:12.5px}}
+.cv-mapwrap{position:relative}
+.cv-tip{position:absolute;top:12px;inset-inline-start:12px;display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;color:#eaf1f8;
+  padding:7px 12px;border-radius:30px;background:rgba(16,37,63,.82);border:1px solid rgba(70,227,208,.45);backdrop-filter:blur(4px);pointer-events:none}
+.cv-tip .hand{display:inline-block;animation:cvtap 1.6s ease-in-out infinite}
+.cv-key{position:absolute;bottom:12px;inset-inline-end:12px;display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:800;color:#c3d2e4;
+  padding:6px 10px;border-radius:30px;background:rgba(16,37,63,.82);border:1px solid rgba(216,183,106,.3);backdrop-filter:blur(4px)}
+.cv-key i{width:22px;height:22px;border-radius:50%;display:inline-grid;place-items:center;font-style:normal;font-size:10.5px;font-weight:900;color:#0b1a2e;border:1.5px solid #10253f}
+.cv-key .nc{display:inline-flex;align-items:center;gap:4px;margin-inline-start:4px;color:#8fa6c2}
+.cv-key i.ring{width:14px;height:14px;background:none;border:1.5px dashed #8fa6c2}
+.cv-bar{justify-content:flex-start}
+@media(max-width:560px){.cv-tip{top:8px;inset-inline-start:8px;font-size:10.5px;padding:5px 9px}.cv-key{bottom:8px;inset-inline-end:8px;font-size:10px;gap:4px;padding:4px 8px}.cv-key i{width:18px;height:18px;font-size:9px}.cv-key .nc{display:none}}
 @media print{.topbar,.nav-shell,.range-shell,.progress{display:none!important}.js .reveal{opacity:1!important;transform:none!important}}
 </style>
 </head>
@@ -982,9 +993,6 @@ body.light .hero-logo.trio img.lg-c{height:96px}body.light .hero-logo.trio img.l
   <div class="tb-controls">
     <button class="icon-btn" id="themeBtn" onclick="toggleTheme()" title="تبديل الوضع">
       <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V8l8-5 8 5v13M9 21v-7h6v7"/></svg>
-    </button>
-    <button class="icon-btn" onclick="window.print()" title="طباعة">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>
     </button>
     <button class="icon-btn" id="fsBtn" onclick="toggleFullScreen()" title="عرض ملء الشاشة">
       <svg id="fsIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M16 21h3a2 2 0 0 0 2-2v-3M8 21H5a2 2 0 0 1-2-2v-3"/></svg>
@@ -1008,15 +1016,16 @@ body.light .hero-logo.trio img.lg-c{height:96px}body.light .hero-logo.trio img.l
   <div class="ach-hero-row c5" id="finaleHero"></div>
   <div class="yr-sec cv-sec">
     <h3 class="yr-title"><span class="gi">🗺️</span>خريطة التغطية في إثيوبيا · 2024 – 2026</h3>
-    <div class="cv-hint"><span class="hand">👆</span><span><b>الخريطة تفاعلية:</b> اضغط على أي دائرة أو اسم إقليم لتظهر لك كل بياناته — المتدربون، والبرامج، والمدن، وسجل الدورات بتواريخها</span></div>
     <div class="cv-bar">
       <div class="cv-filter" id="cvFilter">
         <button data-y="all" class="on">كل السنوات</button><button data-y="2024">2024</button><button data-y="2025">2025</button><button data-y="2026">2026</button>
       </div>
-      <div class="cv-legend"><b class="lg-t">الرقم داخل الشارة = سنة التنفيذ</b><span><i class="yrb" style="background:#f3dca6">24</i>2024</span><span><i class="yrb" style="background:#a99bff">25</i>2025</span><span><i class="yrb" style="background:#5fd9e6">26</i>2026</span><span><i class="ring"></i>لم يُغطَّ بعد</span></div>
     </div>
     <div class="cv-grid">
-      <div class="cv-map" id="cvMap"></div>
+      <div class="cv-mapwrap"><div class="cv-map" id="cvMap"></div>
+        <div class="cv-tip"><span class="hand">👆</span>اضغط على أي إقليم لعرض بياناته</div>
+        <div class="cv-key"><span class="t">سنة التنفيذ</span><i style="background:#f3dca6">24</i><i style="background:#a99bff">25</i><i style="background:#5fd9e6">26</i><span class="nc"><i class="ring"></i>لم يُغطَّ</span></div>
+      </div>
       <div class="cv-panel" id="cvPanel"></div>
     </div>
     <div class="cv-sites">
@@ -1786,7 +1795,7 @@ const CV_REG=[
  ['central','وسط إثيوبيا','إقليم',7.95,37.15,0,0,'below'],
  ['sidama','سيداما','إقليم',6.75,38.75,14,4,'start'],
  ['south','جنوب إثيوبيا','إقليم',5.5,37.95,-12,10,'end'],
- ['sw','جنوب غرب إثيوبيا','إقليم',6.7,35.65,-12,4,'end']];
+ ['sw','جنوب غرب إثيوبيا','إقليم',6.7,35.65,0,0,'below']];
 /* [السنة، البرنامج، الإقليم، المدينة/الموقع، البداية، النهاية، المتدربون] */
 const CV_ITEMS=[
  // 2024 — قسم المشاريع الحبشة 2024 (ورقة «مشاريع اثيوبيا 2024» + «الاعداد»)
@@ -1859,7 +1868,7 @@ function renderCov(){
     <defs><linearGradient id="cvLand" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="rgba(227,196,133,.17)"/><stop offset="1" stop-color="rgba(95,217,230,.08)"/></linearGradient>
     <radialGradient id="cvGold" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff3d1"/><stop offset="1" stop-color="#c9a24f"/></radialGradient></defs>
     ${g}<polygon class="cv-land" points="${pts}"/>${bub}${lbl}
-    <text x="${W-12}" y="${H-12}" text-anchor="end" style="font:700 10px Tajawal,sans-serif;fill:#8fa6c2">مخطّط توضيحي — المواقع تقريبية · حجم الدائرة = عدد المتدربين</text></svg>`;
+    </svg>`;
   document.querySelectorAll('#cvMap .cv-b').forEach(el=>{
     const k=el.dataset.k,s=st[k],R=CV_REG.find(r=>r[0]===k);
     el.addEventListener('mouseenter',()=>showTip(el,{html:`<b>${R[1]}</b> · ${R[2]}<br>${s.n?`${fmt(s.a)} متدرباً · ${s.n} برنامجاً<br><span style="opacity:.75">${s.yrs.join(' · ')}</span>`:(cvRegStats(k,CV_ALL).n?'لا برامج في هذه السنة':'لم يُغطَّ بعد')}`}));
@@ -2032,6 +2041,7 @@ const C_NORM=s=>{s=String(s||'').trim();return {'شامشني':'شاشمني','�
 const A_NORM=s=>{s=String(s||'').trim();return {'معرفا':'معرّفون','معرفاً':'معرّفون','معرفون':'معرّفون','معرّفا':'معرّفون'}[s]||s;};
 function gvizToArrays(t){return (t.rows||[]).map(r=>(r.c||[]).map(c=>{if(!c)return '';if(c.f!=null&&c.f!=='')return c.f;return c.v==null?'':c.v;}));}
 function parseRows(R){
+  R=R.map(row=>(row||[]).map(v=>String(v==null?'':v).replace(/[\u0660-\u0669]/g,d=>d.charCodeAt(0)-0x0660).replace(/[\u06F0-\u06F9]/g,d=>d.charCodeAt(0)-0x06F0).replace(/\u066B/g,'.').replace(/\u066C/g,',').replace(/[\u200E\u200F\u061C]/g,'').trim()));
   const D=s=>{s=String(s||'');let m=s.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);if(m)return `${m[1]}/${String(m[2]).padStart(2,'0')}/${String(m[3]).padStart(2,'0')}`;
     m=s.match(/Date\((\d+),(\d+),(\d+)/);if(m)return `${m[1]}/${String(+m[2]+1).padStart(2,'0')}/${String(m[3]).padStart(2,'0')}`;return '';};
   const N=v=>{const x=parseFloat(String(v).replace(/[^\d.\-]/g,''));return isNaN(x)?0:x;};
