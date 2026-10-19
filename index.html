@@ -2084,10 +2084,7 @@ function fetchLive(){
     .then(R=>(R&&R.length>=5)?R:sheetJSONP(6000).then(t=>t?gvizToArrays(t):null))
     .then(R=>{if(!R)return null;try{const rows=parseRows(R);return (rows.length>=5&&rows.some(p=>p.st==='done'))?{R,rows}:null;}catch(e){console.warn('sheet parse',e);return null;}});}
 function setSync(state,when){const b=document.getElementById('syncBadge'),f=document.getElementById('syncFoot');
-  const map={live:['live',`● مرتبط مباشرة بشيت 2026 · آخر مزامنة ${fmtT(when||Date.now())}`],
-    cached:['live',`● بيانات الشيت · آخر مزامنة ${fmtT(when||Date.now())} — جاري التحقق من التحديثات…`],
-    newer:['newer','● وصلت بيانات أحدث من الشيت — اضغط «تحديث» لعرضها'],
-    offline:['off','● تعذّر الاتصال بالشيت — تُعرض آخر بيانات محفوظة'],loading:['load','◌ جاري جلب أحدث البيانات من الشيت…']};
+  const map={live:['live','● مرتبط'],cached:['live','● مرتبط'],newer:['newer','● مرتبط'],offline:['off','● غير مرتبط'],loading:['load','◌ …']};
   const [cls,txt]=map[state];if(b){b.className='sync '+cls;b.innerHTML=`<span>${txt}</span>${state!=='loading'?'<button onclick="location.reload()" title="تحديث البيانات">⟳ تحديث</button>':''}`;}
   if(f)f.textContent=state==='offline'?'بيانات 2026 محفوظة داخل الصفحة':`بيانات 2026 من الشيت حتى ${fmtT(when||Date.now())}`;}
 function boot(){
