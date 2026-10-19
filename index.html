@@ -981,6 +981,15 @@ body.light .hero-logo.trio img.lg-c{height:96px}body.light .hero-logo.trio img.l
 .cv-key i.ring{width:14px;height:14px;background:none;border:1.5px dashed #8fa6c2}
 .cv-bar{justify-content:flex-start}
 @media(max-width:560px){.cv-tip{top:8px;inset-inline-start:8px;font-size:10.5px;padding:5px 9px}.cv-key{bottom:8px;inset-inline-end:8px;font-size:10px;gap:4px;padding:4px 8px}.cv-key i{width:18px;height:18px;font-size:9px}.cv-key .nc{display:none}}
+@media(max-width:760px){
+  .cv-mapwrap{display:flex;flex-direction:column;gap:8px}
+  .cv-mapwrap .cv-tip{position:static;order:-1;align-self:center;font-size:11.5px;padding:6px 12px}
+  .cv-mapwrap .cv-key{position:static;align-self:center;font-size:11px;padding:5px 10px}
+  .cv-mapwrap .cv-key .nc{display:inline-flex}
+}
+.sync.newer{color:#f3dca6;background:rgba(216,183,106,.12);border-color:rgba(216,183,106,.45)}
+.sync.newer button{animation:pulseBtn 1.4s ease-in-out infinite;border-color:var(--gold)}
+@keyframes pulseBtn{0%,100%{box-shadow:0 0 0 0 rgba(216,183,106,.5)}50%{box-shadow:0 0 0 6px rgba(216,183,106,0)}}
 @media print{.topbar,.nav-shell,.range-shell,.progress{display:none!important}.js .reveal{opacity:1!important;transform:none!important}}
 </style>
 </head>
@@ -1794,7 +1803,7 @@ const CV_REG=[
  ['gambela','غامبيلا','إقليم',8.35,34.6,-12,-30,'start'],
  ['central','وسط إثيوبيا','إقليم',7.95,37.15,0,0,'below'],
  ['sidama','سيداما','إقليم',6.75,38.75,14,4,'start'],
- ['south','جنوب إثيوبيا','إقليم',5.5,37.95,-12,10,'end'],
+ ['south','جنوب إثيوبيا','إقليم',5.5,37.95,12,6,'start'],
  ['sw','جنوب غرب إثيوبيا','إقليم',6.7,35.65,0,0,'below']];
 /* [السنة، البرنامج، الإقليم، المدينة/الموقع، البداية، النهاية، المتدربون] */
 const CV_ITEMS=[
@@ -2060,12 +2069,27 @@ function applySheet(rows){
   const first={};ex.forEach(p=>{if(p.c&&(!first[p.c]||p.s<first[p.c]))first[p.c]=p.s;});
   REG_ORDER=Object.keys(first).sort((x,y)=>first[x]<first[y]?-1:1);
 }
-function setSync(state){const b=document.getElementById('syncBadge'),f=document.getElementById('syncFoot');
-  const t=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-  const map={live:['live',`● مرتبط مباشرة بشيت 2026 · آخر مزامنة ${TODAY_TXT} ${t}`],
+const CACHE_KEY='eth26_rows_v1';
+function cacheGet(){try{const c=JSON.parse(localStorage.getItem(CACHE_KEY)||'null');return c&&Array.isArray(c.rows)&&c.rows.length>=5?c:null;}catch(e){return null;}}
+function cacheSet(R){try{localStorage.setItem(CACHE_KEY,JSON.stringify({t:Date.now(),rows:R}));}catch(e){}}
+const fmtT=ms=>{const d=new Date(ms);return `${d.getDate()} ${MN[d.getMonth()+1]} ${d.getFullYear()} ${d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}`;};
+function webappFetch(timeout){
+  if(!WEBAPP_URL||!window.fetch)return Promise.resolve(null);
+  const ac=window.AbortController?new AbortController():null;const tm=setTimeout(()=>ac&&ac.abort(),timeout);
+  return fetch(`${WEBAPP_URL}${WEBAPP_URL.includes('?')?'&':'?'}_=${Date.now()}`,{credentials:'omit',redirect:'follow',cache:'no-store',signal:ac?ac.signal:undefined})
+    .then(r=>r.json()).then(j=>(j&&j.ok&&Array.isArray(j.rows))?j.rows:null).catch(()=>null).finally(()=>clearTimeout(tm));}
+function fetchLive(){
+  return webappFetch(20000)
+    .then(R=>(R&&R.length>=5)?R:(WEBAPP_URL?webappJSONP(12000):Promise.resolve(null)))
+    .then(R=>(R&&R.length>=5)?R:sheetJSONP(6000).then(t=>t?gvizToArrays(t):null))
+    .then(R=>{if(!R)return null;try{const rows=parseRows(R);return (rows.length>=5&&rows.some(p=>p.st==='done'))?{R,rows}:null;}catch(e){console.warn('sheet parse',e);return null;}});}
+function setSync(state,when){const b=document.getElementById('syncBadge'),f=document.getElementById('syncFoot');
+  const map={live:['live',`● مرتبط مباشرة بشيت 2026 · آخر مزامنة ${fmtT(when||Date.now())}`],
+    cached:['live',`● بيانات الشيت · آخر مزامنة ${fmtT(when||Date.now())} — جاري التحقق من التحديثات…`],
+    newer:['newer','● وصلت بيانات أحدث من الشيت — اضغط «تحديث» لعرضها'],
     offline:['off','● تعذّر الاتصال بالشيت — تُعرض آخر بيانات محفوظة'],loading:['load','◌ جاري جلب أحدث البيانات من الشيت…']};
   const [cls,txt]=map[state];if(b){b.className='sync '+cls;b.innerHTML=`<span>${txt}</span>${state!=='loading'?'<button onclick="location.reload()" title="تحديث البيانات">⟳ تحديث</button>':''}`;}
-  if(f)f.textContent=state==='live'?`بيانات 2026 مباشرة من الشيت حتى ${TODAY_TXT}`:'بيانات 2026 محفوظة داخل الصفحة';}
+  if(f)f.textContent=state==='offline'?'بيانات 2026 محفوظة داخل الصفحة':`بيانات 2026 من الشيت حتى ${fmtT(when||Date.now())}`;}
 function boot(){
   buildRange();buildBudget();buildFinale();apply();onScroll();applyTheme(0,false);
   document.body.classList.remove('booting');
@@ -2073,10 +2097,22 @@ function boot(){
   document.querySelectorAll('.fill[data-pct]').forEach(f=>f.style.width=f.dataset.pct+'%');
   document.querySelectorAll('.vb .col[data-h]').forEach(c=>c.style.height=c.dataset.h+'%');},2500);
 }
-setSync('loading');
-(WEBAPP_URL?webappJSONP(9000):Promise.resolve(null)).then(R=>(R&&R.length>=5)?R:sheetJSONP(6000).then(t=>t?gvizToArrays(t):null)).then(R=>{let ok=false;
-  if(R){try{const rows=parseRows(R);if(rows.length>=5&&rows.some(p=>p.st==='done')){applySheet(rows);ok=true;}}catch(e){console.warn('sheet parse',e);}}
-  DATA_SRC=ok?'live':'embedded';setSync(ok?'live':'offline');boot();});
+(function(){
+  const cached=cacheGet(), sig=R=>JSON.stringify(R);
+  if(cached){ // عرض فوري من آخر مزامنة، ثم تحقق في الخلفية
+    try{applySheet(parseRows(cached.rows));DATA_SRC='live';}catch(e){}
+    setSync('cached',cached.t);boot();
+    fetchLive().then(res=>{if(!res){setSync('cached',cached.t);return;}
+      cacheSet(res.R);
+      if(sig(res.R)===sig(cached.rows))setSync('live');else setSync('newer');});
+  } else {
+    setSync('loading');
+    fetchLive().then(res=>{
+      if(res){applySheet(res.rows);cacheSet(res.R);DATA_SRC='live';setSync('live');}
+      else{DATA_SRC='embedded';setSync('offline');}
+      boot();});
+  }
+})();
 
 </script>
 </body>
