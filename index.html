@@ -990,6 +990,12 @@ body.light .hero-logo.trio img.lg-c{height:96px}body.light .hero-logo.trio img.l
 .sync.newer{color:#f3dca6;background:rgba(216,183,106,.12);border-color:rgba(216,183,106,.45)}
 .sync.newer button{animation:pulseBtn 1.4s ease-in-out infinite;border-color:var(--gold)}
 @keyframes pulseBtn{0%,100%{box-shadow:0 0 0 0 rgba(216,183,106,.5)}50%{box-shadow:0 0 0 6px rgba(216,183,106,0)}}
+/* منع قص نقاط الحروف (ث، ش…) في النصوص المتدرّجة على الجوال */
+.ach-head h2{line-height:1.6!important;padding:.12em .1em .06em;overflow:visible}
+.y26-head h2{line-height:1.6}
+.y26-head h2 .t2,.y26-head h2 .t1{padding:.12em .05em .06em;line-height:1.6}
+.yr-badge{line-height:1.5;padding-top:.08em}
+.hero .wordmark{line-height:1.5;padding-top:.08em}
 @media print{.topbar,.nav-shell,.range-shell,.progress{display:none!important}.js .reveal{opacity:1!important;transform:none!important}}
 </style>
 <!-- توقيع المطوّر: أسامة جنيدي -->
@@ -2150,11 +2156,11 @@ function boot(){
 <!-- توقيع المطوّر: السنة واللون -->
 <script>
 (function(){
-  // ١) السنة تتحدث تلقائياً
+  // 1) السنة تتحدث تلقائياً
   var y = new Date().getFullYear();
   document.querySelectorAll('.oj2-year').forEach(function(s){ s.textContent = y; });
 
-  // ٢) التقاط اللون الأساسي من هوية الموقع
+  // 2) التقاط اللون الأساسي من هوية الموقع
   function rgb(c){
     if(!c) return null; c = c.trim(); if(!c) return null;
     if(/^\d+(\.\d+)?\s+\d+(\.\d+)?%\s+\d+(\.\d+)?%$/.test(c)) c = 'hsl(' + c + ')'; // صيغة shadcn/Tailwind
